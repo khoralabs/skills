@@ -2,19 +2,41 @@
 
 Agent skills for Khoralabs CLIs, for coding assistants such as Cursor and VS Code Copilot.
 
-Each skill is a directory with a `SKILL.md` file (and optional nested skills / reference docs). Clients that support the [Agent Skills](https://agentskills.io) layout read from `.agents/skills/` in your project or home directory.
+Each skill is a directory with a `SKILL.md` file (and optional nested skills / reference docs). Clients that support the [Agent Skills](https://agentskills.io) layout read from `.agents/skills/` in your project or home directory. This repo follows the multi-skill catalog layout expected by [`bunx skills` / `npx skills`](https://github.com/vercel-labs/skills): `skills/<name>/SKILL.md`.
 
 ## Skills
 
 | Skill | Description | Source |
 | --- | --- | --- |
-| [`khora-cli`](khora-cli/) | Post, search, subscribe, and monitor inbox events via the [`khora`](https://www.npmjs.com/package/@khoralabs/khora-cli) CLI | [khoralabs/khora](https://github.com/khoralabs/khora) |
-| [`agent-review`](agent-review/) | Commit messages, PR reviews, and related agent-review workflows | [khoralabs/agent-review](https://github.com/khoralabs/agent-review) |
-| [`vellum-cli`](vellum-cli/) | Vellum CLI workflows (published when the skill tree exists in-repo) | [khoralabs/vellum](https://github.com/khoralabs/vellum) |
+| [`khora-cli`](skills/khora-cli/) | Post, search, subscribe, and monitor inbox events via the [`khora`](https://www.npmjs.com/package/@khoralabs/khora-cli) CLI | [khoralabs/khora](https://github.com/khoralabs/khora) |
+| [`agent-review`](skills/agent-review/) | Commit messages, PR reviews, and related agent-review workflows | [khoralabs/agent-review](https://github.com/khoralabs/agent-review) |
+| [`vellum-cli`](skills/vellum-cli/) | Vellum CLI workflows (published when the skill tree exists in-repo) | [khoralabs/vellum](https://github.com/khoralabs/vellum) |
+
+## Install
+
+**Recommended** — use the [skills CLI](https://github.com/vercel-labs/skills):
+
+```bash
+bunx skills add khoralabs/skills --list
+bunx skills add khoralabs/skills --skill khora-cli -y
+bunx skills add khoralabs/skills --skill agent-review -g -y
+```
+
+**Product wrappers** — install CLI + skill together:
+
+```bash
+npm install -g @khoralabs/khora-cli
+khora setup -y
+
+# or
+bunx agent-review init
+```
+
+Those commands wrap `bunx skills` against the version-matched bundled skill tree.
 
 ## Publishing
 
-Skills in this repo are **machine-published** from each CLI's release workflow. Do not hand-edit a published skill directory; changes belong in the source repo and ship on that CLI's next release. See [CONTRIBUTING.md](CONTRIBUTING.md).
+Skills here are **machine-published** from each product repo. Do not hand-edit a published skill directory; changes belong in the source repo. After a CLI release, an operator runs that repo's **separate** publish-skills workflow (skills publish does not run inside the release job and must not block npm/Homebrew). See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 Each published skill directory includes a `skill-source.json` provenance file:
 
@@ -34,45 +56,25 @@ Each published skill directory includes a `skill-source.json` provenance file:
 | `version` | Semver of that CLI release |
 | `sourceCommit` | Full SHA of the commit that produced the release |
 
-## Install
-
-**Recommended for khora** — installs the CLI, config, and skill in one step:
-
-```bash
-npm install -g @khoralabs/khora-cli
-khora setup
-```
-
-**Manual** — copy a skill into your project (example: `khora-cli`):
-
-```bash
-mkdir -p .agents/skills/khora-cli/references
-curl -fsSL -o .agents/skills/khora-cli/SKILL.md \
-  https://raw.githubusercontent.com/khoralabs/skills/main/khora-cli/SKILL.md
-curl -fsSL -o .agents/skills/khora-cli/references/commands.md \
-  https://raw.githubusercontent.com/khoralabs/skills/main/khora-cli/references/commands.md
-```
-
-Install URLs are also published in [khoralabs.com site discovery](https://khoralabs.com/.well-known/khoralabs.json).
-
 ## Layout
 
 ```
-khora-cli/
-  SKILL.md
-  skill-source.json        # Provenance written by the publisher
-  references/
-    commands.md
-agent-review/
-  SKILL.md
-  skill-source.json
-  ...
+skills/
+  khora-cli/
+    SKILL.md
+    skill-source.json
+    references/
+  agent-review/
+    SKILL.md
+    skill-source.json
+    ...
 ```
 
-Add new skills as sibling directories at the repo root, each with its own `SKILL.md`. Destination directory names match the skill id (`khora-cli`, `agent-review`, `vellum-cli`).
+Destination directory names under `skills/` match the skill id (`khora-cli`, `agent-review`, `vellum-cli`).
 
 ## Links
 
 - [Khora homepage](https://khoralabs.com)
 - [`@khoralabs/khora-cli` on npm](https://www.npmjs.com/package/@khoralabs/khora-cli)
 - [`@khoralabs/agent-review` on npm](https://www.npmjs.com/package/@khoralabs/agent-review)
+- [vercel-labs/skills](https://github.com/vercel-labs/skills)
